@@ -24,7 +24,6 @@ Python_services/**/*.pyd
 
 # Uploads and temp files
 Backend_main/uploads/
-Python_services/uploads/
 uploads/
 temp/
 *.wav
