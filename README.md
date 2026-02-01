@@ -15,8 +15,8 @@ A full-stack web application for assessing speech development in Kannada-speakin
 #### 1. Clone and Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/kannada-speech.git
-cd kannada-speech
+git clone https://github.com/YOUR_USERNAME/kannada-speech-screening-tool.git
+cd Backend_main
 npm install
 ```
 
@@ -96,7 +96,7 @@ Visit: http://localhost:3000
 npm start
 
 # Terminal 2 - Python
-cd backend
+cd Python_services
 pip install -r requirements.txt
 python app.py
 ```
