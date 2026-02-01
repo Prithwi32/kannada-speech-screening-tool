@@ -1,0 +1,62 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git - exclude .git directories
+.git/
+.gitignore
+
+# But explicitly include txt2ipa package files (override exclusions)
+!backend/txt2ipa/
+!backend/txt2ipa/__init__.py
+!backend/txt2ipa/setup.py
+!backend/txt2ipa/README.md
+!backend/txt2ipa/LICENSE
+!backend/txt2ipa/CREDITS
+!backend/txt2ipa/kannada2ipa/
+!backend/txt2ipa/kannada2ipa/__init__.py
+!backend/txt2ipa/kannada2ipa/*.py
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# Uploads (created at runtime)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+project-structure.txt
+assets/images/work plan/
+
+# Test files
+test-*.js

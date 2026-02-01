@@ -1,0 +1,55 @@
+# Python virtual environments
+Python_services/.venv/
+# Environment variables
+.env
+.env.local
+.env.production
+.env.docker
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.docker
+
+# Node.js dependencies
+Backend_main/node_modules/
+
+# Python cache and venv
+Python_services/.venv/
+Python_services/**/__pycache__/
+Python_services/**/*.pyc
+Python_services/**/*.pyo
+Python_services/**/*.pyd
+
+# Uploads and temp files
+Backend_main/uploads/
+Python_services/uploads/
+uploads/
+temp/
+*.wav
+*.mp3
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE/project
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc
+project-structure.txt
+

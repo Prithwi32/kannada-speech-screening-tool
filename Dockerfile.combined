@@ -1,0 +1,104 @@
+# Multi-stage Dockerfile for Render.com Free Tier
+# Combines Node.js and Python backends in one container
+
+# Stage 1: Build Node.js
+FROM node:18-alpine AS node-builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Stage 2: Python Runtime
+FROM python:3.11-slim
+
+# Install Node.js, FFmpeg, and system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    ffmpeg \
+    nodejs \
+    npm \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy Node.js app
+COPY --from=node-builder /app/node_modules ./node_modules
+COPY package*.json ./
+COPY server-production.js ./server.js
+COPY config ./config
+COPY middleware ./middleware
+COPY models ./models
+COPY utils ./utils
+COPY assets ./assets
+COPY *.html ./
+COPY css ./css
+COPY js ./js
+
+# Copy Python backend
+COPY backend/requirements.txt ./backend/
+COPY backend/app.py ./backend/
+COPY backend/soda_analysis.py ./backend/
+COPY backend/audio2text ./backend/audio2text
+COPY backend/syllable_Comparision ./backend/syllable_Comparision
+COPY backend/utils ./backend/utils
+
+# Copy txt2ipa - copy each component explicitly to avoid .git/.gitignore issues
+COPY backend/txt2ipa/setup.py ./backend/txt2ipa/
+COPY backend/txt2ipa/__init__.py ./backend/txt2ipa/
+COPY backend/txt2ipa/LICENSE ./backend/txt2ipa/
+COPY backend/txt2ipa/README.md ./backend/txt2ipa/
+COPY backend/txt2ipa/CREDITS ./backend/txt2ipa/
+COPY backend/txt2ipa/kannada2ipa ./backend/txt2ipa/kannada2ipa
+
+# Create uploads directory for runtime
+RUN mkdir -p /app/backend/uploads
+
+# Install Python dependencies
+WORKDIR /app/backend
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Add txt2ipa to Python path and verify import works
+ENV PYTHONPATH="/app/backend/txt2ipa:${PYTHONPATH}"
+RUN python -c "from kannada2ipa.ipaconvert import kannada2ipa; print('✅ kannada2ipa verified')"
+
+# Setup supervisord to run both servers
+WORKDIR /app
+RUN echo "[supervisord]\n\
+    nodaemon=true\n\
+    loglevel=info\n\
+    \n\
+    [program:python-backend]\n\
+    command=python backend/app.py\n\
+    directory=/app\n\
+    environment=PYTHON_PORT=5000,FFMPEG_PATH=/usr/bin/ffmpeg,UPLOAD_FOLDER=/app/backend/uploads\n\
+    autostart=true\n\
+    autorestart=true\n\
+    stderr_logfile=/dev/stderr\n\
+    stderr_logfile_maxbytes=0\n\
+    stdout_logfile=/dev/stdout\n\
+    stdout_logfile_maxbytes=0\n\
+    startsecs=10\n\
+    startretries=3\n\
+    \n\
+    [program:node-backend]\n\
+    command=node server.js\n\
+    directory=/app\n\
+    environment=PORT=3000,PYTHON_BACKEND_URL=http://localhost:5000\n\
+    autostart=true\n\
+    autorestart=true\n\
+    stderr_logfile=/dev/stderr\n\
+    stderr_logfile_maxbytes=0\n\
+    stdout_logfile=/dev/stdout\n\
+    stdout_logfile_maxbytes=0\n\
+    startsecs=5\n\
+    startretries=3" > /etc/supervisor/conf.d/supervisord.conf
+
+# Expose port
+EXPOSE 3000
+
+# Health check - verify both Node.js and Python are running
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:3000/health || exit 1
+
+# Start both servers with supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
