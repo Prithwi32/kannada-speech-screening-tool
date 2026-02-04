@@ -1,6 +1,7 @@
 # Node modules
 node_modules/
 npm-debug.log
+Backend_main/node_modules/
 
 # Python cache
 __pycache__/
@@ -9,11 +10,15 @@ __pycache__/
 *.pyd
 .Python
 *.so
+Python_services/.venv/
+Python_services/**/__pycache__/
 
 # Environment files
 .env
 .env.local
 .env.*.local
+.env.production
+.env.docker
 
 # IDE
 .vscode/
@@ -25,9 +30,38 @@ __pycache__/
 # Git - exclude .git directories
 .git/
 .gitignore
+.gitattributes
 
-# But explicitly include txt2ipa package files (override exclusions)
-!backend/txt2ipa/
+# Build artifacts
+dist/
+build/
+*.log
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Documentation (optional - exclude if not needed in container)
+# docs/
+# *.md
+
+# Large media files (should be in S3/cloud storage)
+# Backend_main/uploads/
+# Python_services/uploads/
+# *.wav
+# *.mp3
+# *.mp4
+
+# But explicitly include txt2ipa package files
+!Python_services/txt2ipa/
+!Python_services/txt2ipa/**/*
 !backend/txt2ipa/__init__.py
 !backend/txt2ipa/setup.py
 !backend/txt2ipa/README.md
