@@ -106,8 +106,13 @@ app.use(express.json());
 // Setup multer for handling file uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Serve static files (place this before API routes)
+// Serve static files from Frontend_main
 app.use(express.static(path.join(__dirname, "..", "Frontend_main")));
+
+// Fallback: serve index.html for any unknown route (for SPA or direct root access)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "Frontend_main", "index.html"));
+});
 
 // Start server after attempting MongoDB connection
 (async () => {
