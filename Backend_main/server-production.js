@@ -964,7 +964,8 @@ app.use(express.static(frontendPath));
   });
 
   // Fallback: serve index.html for any unknown route (SPA fallback - MUST be last)
-  app.get("*", (req, res) => {
+  // Express 5 requires named wildcard parameter syntax instead of just "*"
+  app.get("/{*splat}", (req, res) => {
     const indexPath = process.env.NODE_ENV === 'production' && !fs.existsSync(path.join(__dirname, "..", "Frontend_main", "index.html"))
       ? path.join(__dirname, "index.html")  // Docker: index.html is in /app
       : path.join(__dirname, "..", "Frontend_main", "index.html");  // Local: ../Frontend_main/index.html
