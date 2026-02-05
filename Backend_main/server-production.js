@@ -112,8 +112,13 @@ app.use(express.json());
 // Setup multer for handling file uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Serve static files from Frontend_main
-app.use(express.static(path.join(__dirname, "..", "Frontend_main")));
+// Serve static files - adjusted for Docker deployment
+// In Docker, frontend files are copied to /app root, not /app/Frontend_main
+const frontendPath = process.env.NODE_ENV === 'production' && !fs.existsSync(path.join(__dirname, "..", "Frontend_main"))
+  ? __dirname  // Docker: files are in /app
+  : path.join(__dirname, "..", "Frontend_main");  // Local: files are in ../Frontend_main
+
+app.use(express.static(frontendPath));
 
 // Start server after attempting MongoDB connection
 (async () => {
@@ -960,7 +965,10 @@ app.use(express.static(path.join(__dirname, "..", "Frontend_main")));
 
   // Fallback: serve index.html for any unknown route (SPA fallback - MUST be last)
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "..", "Frontend_main", "index.html"));
+    const indexPath = process.env.NODE_ENV === 'production' && !fs.existsSync(path.join(__dirname, "..", "Frontend_main", "index.html"))
+      ? path.join(__dirname, "index.html")  // Docker: index.html is in /app
+      : path.join(__dirname, "..", "Frontend_main", "index.html");  // Local: ../Frontend_main/index.html
+    res.sendFile(indexPath);
   });
 
   // Start server (wrapped in async function at top)

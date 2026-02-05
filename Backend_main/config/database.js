@@ -6,10 +6,8 @@ const connectDB = async () => {
     const mongoURI =
       process.env.MONGODB_URI || "mongodb://localhost:27017/kannada_speech_db";
 
-    await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // Note: useNewUrlParser and useUnifiedTopology are deprecated in MongoDB driver v4+
+    await mongoose.connect(mongoURI);
 
     console.log("✅ MongoDB connected successfully");
   } catch (error) {
