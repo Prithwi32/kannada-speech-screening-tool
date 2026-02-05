@@ -22,6 +22,7 @@ A full-stack web application for assessing speech development in Kannada-speakin
 #### 1. Validate Deployment
 
 **Windows:**
+
 ```powershell
 .\vkannada-speech-screening-tool
 cd Backend_main
@@ -31,13 +32,14 @@ npm install
 #### 3. Configure Environment Variables
 
 Copy `.env.example` to `.env`:
+
 ```bash
 cp .env.example .env
 ```
 
 Then edit `.env` with your credentials (never commit this!):
 
-```
+````
 
 #### 2. Clone and Setup
 
@@ -45,7 +47,7 @@ Then edit `.env` with your credentials (never commit this!):
 git clone https://github.com/YOUR_USERNAME/kannada-speech-screening-tool.git
 cd Backend_main
 npm install
-```
+````
 
 #### 2. Configure Environment Variables
 
@@ -66,6 +68,7 @@ PYTHON_BACKEND_URL=http://localhost:5000
 FFMPEG_PATH=/usr/bin/ffmpeg
 ALLOWED_ORIGINS=https://your-app.onrender.com
 ```
+
 4
 **Generate JWT Secret:**
 

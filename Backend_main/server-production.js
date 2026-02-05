@@ -18,13 +18,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const PYTHON_BACKEND_URL =
   process.env.PYTHON_BACKEND_URL || "http://localhost:5000";
-const DATA_PATH = path.join(__dirname, "..", "Frontend_main", "assets", "data", "children.json");
+const DATA_PATH = path.join(
+  __dirname,
+  "..",
+  "Frontend_main",
+  "assets",
+  "data",
+  "children.json",
+);
 
 // Check if MongoDB is connected
 const useDatabase = () => {
   return require("mongoose").connection.readyState === 1;
 };
-
 
 // Optional font paths (add these files to assets/fonts to enable Unicode/IPA)
 const FONT_KANNADA_VAR = path.join(
@@ -108,11 +114,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // Serve static files from Frontend_main
 app.use(express.static(path.join(__dirname, "..", "Frontend_main")));
-
-// Fallback: serve index.html for any unknown route (for SPA or direct root access)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "Frontend_main", "index.html"));
-});
 
 // Start server after attempting MongoDB connection
 (async () => {
@@ -400,7 +401,13 @@ app.get("*", (req, res) => {
   });
 
   app.get("/download-reference-pdf", (req, res) => {
-    const imgPath = path.join(__dirname, "..", "Frontend_main", "assets", "reference.jpg");
+    const imgPath = path.join(
+      __dirname,
+      "..",
+      "Frontend_main",
+      "assets",
+      "reference.jpg",
+    );
     if (!fs.existsSync(imgPath)) {
       return res.status(404).send("Image not found");
     }
@@ -541,7 +548,6 @@ app.get("*", (req, res) => {
       if (fs.existsSync(FONT_LATIN)) {
         doc.registerFont("ipa", FONT_LATIN);
       }
-  
 
       // Kannada translations
       // const labels = {
@@ -601,12 +607,11 @@ app.get("*", (req, res) => {
       const defaultFont = useKannadaFont ? "Kannada" : "Helvetica";
       const boldFont = useKannadaFont ? "KannadaBold" : "Helvetica-Bold";
 
-
       doc
-      .fontSize(20)
-      .font(fs.existsSync(FONT_KANNADA) ? "KannadaBold" : "Helvetica-Bold")
-      .text("ಮಗುವಿನ ಪ್ರಗತಿ ವರದಿ", { align: "center" })
-      .moveDown(0.5);
+        .fontSize(20)
+        .font(fs.existsSync(FONT_KANNADA) ? "KannadaBold" : "Helvetica-Bold")
+        .text("ಮಗುವಿನ ಪ್ರಗತಿ ವರದಿ", { align: "center" })
+        .moveDown(0.5);
 
       // Child details
       doc
@@ -682,7 +687,9 @@ app.get("*", (req, res) => {
 
         doc.fontSize(10).font(latinFont);
         doc.text("Error Type | Target Word | Spoken Phonemes");
-        doc.text("------------------------------------------------------------");
+        doc.text(
+          "------------------------------------------------------------",
+        );
 
         rows.forEach((r) => {
           const spoken = r.spoken_ipa || r.spoken || r.spoken_phonemes || "";
@@ -949,6 +956,11 @@ app.get("*", (req, res) => {
         });
       }
     }
+  });
+
+  // Fallback: serve index.html for any unknown route (SPA fallback - MUST be last)
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "..", "Frontend_main", "index.html"));
   });
 
   // Start server (wrapped in async function at top)
