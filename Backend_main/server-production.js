@@ -588,27 +588,26 @@ app.use(express.static(frontendPath));
       //   distortionType: "ವಿರೂಪ",
       // };
 
-      // Helper function to translate gender
-      const translateGender = (gender) => {
-        if (!gender) return labels.na;
-        const g = gender.toLowerCase();
-        if (g === "male") return labels.male;
-        if (g === "female") return labels.female;
-        if (g === "other") return labels.other;
-        return gender;
-      };
+      // Helper functions commented out since labels object is not used
+      // const translateGender = (gender) => {
+      //   if (!gender) return labels.na;
+      //   const g = gender.toLowerCase();
+      //   if (g === "male") return labels.male;
+      //   if (g === "female") return labels.female;
+      //   if (g === "other") return labels.other;
+      //   return gender;
+      // };
 
-      // Helper function to translate error type
-      const translateErrorType = (errorType) => {
-        if (!errorType) return labels.na;
-        const e = errorType.toLowerCase();
-        if (e === "correct") return labels.correctType;
-        if (e === "substitution") return labels.substitutionType;
-        if (e === "omission") return labels.omissionType;
-        if (e === "addition") return labels.additionType;
-        if (e === "distortion") return labels.distortionType;
-        return errorType;
-      };
+      // const translateErrorType = (errorType) => {
+      //   if (!errorType) return labels.na;
+      //   const e = errorType.toLowerCase();
+      //   if (e === "correct") return labels.correctType;
+      //   if (e === "substitution") return labels.substitutionType;
+      //   if (e === "omission") return labels.omissionType;
+      //   if (e === "addition") return labels.additionType;
+      //   if (e === "distortion") return labels.distortionType;
+      //   return errorType;
+      // };
 
       // Set default font to Kannada if available, otherwise Helvetica
       const defaultFont = useKannadaFont ? "Kannada" : "Helvetica";
@@ -767,7 +766,7 @@ app.use(express.static(frontendPath));
 
       doc
         .fontSize(11)
-        .font(hasKannadaFont ? "Kannada" : "latinFont")
+        .font(hasKannadaFont ? "Kannada" : latinFont)
         .text(
           Array.isArray(payload.practiceList) && payload.practiceList.length
             ? payload.practiceList.join(", ")
