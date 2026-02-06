@@ -85,8 +85,12 @@ def ipa2kannada_api():
 if __name__ == "__main__":
     # Use PYTHON_PORT to avoid conflict with Node.js PORT
     port = int(os.environ.get("PYTHON_PORT", 5000))
-    print(f"🚀 Starting Flask server on http://127.0.0.1:{port}")
-    app.run(host="0.0.0.0", port=port, debug=True)
+    debug_mode = os.environ.get("FLASK_DEBUG", "false").lower() == "true"
+    print(f"🚀 Starting Flask server on http://0.0.0.0:{port}")
+    print(f"🐛 Debug mode: {debug_mode}")
+    print(f"📁 Upload folder: {UPLOAD_FOLDER}")
+    print(f"🎬 FFmpeg path: {FFMPEG_PATH}")
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)
 
 
 
