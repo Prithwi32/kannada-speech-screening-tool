@@ -963,6 +963,70 @@ app.use(express.static(frontendPath));
     }
   });
 
+  // Proxy endpoint for IPA to Kannada conversion
+  app.post("/ipa2kannada", async (req, res) => {
+    try {
+      console.log("📥 Received IPA2Kannada request");
+      console.log("  - syllables:", req.body.syllables);
+
+      // Validate input
+      if (!req.body.syllables || !Array.isArray(req.body.syllables)) {
+        return res.status(400).json({
+          error: "Missing or invalid syllables parameter. Expected an array.",
+        });
+      }
+
+      console.log(
+        `🔗 Proxying IPA2Kannada request to ${PYTHON_BACKEND_URL}/ipa2kannada`,
+      );
+
+      const response = await axios.post(
+        `${PYTHON_BACKEND_URL}/ipa2kannada`,
+        { syllables: req.body.syllables },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: 10000, // 10 second timeout
+        },
+      );
+
+      console.log("✅ IPA2Kannada conversion successful");
+      res.json(response.data);
+    } catch (error) {
+      console.error("❌ IPA2Kannada proxy error:", error);
+      console.error("Error details:", {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+
+      if (error.response) {
+        // Python backend returned an error
+        console.error("Python backend error:", error.response.data);
+        res.status(error.response.status).json(error.response.data);
+      } else if (error.code === "ECONNREFUSED") {
+        // Python backend not accessible
+        res.status(503).json({
+          error: "Python backend unavailable",
+          details: `Cannot connect to ${PYTHON_BACKEND_URL}. Make sure Flask server is running.`,
+        });
+      } else if (error.code === "ETIMEDOUT") {
+        res.status(504).json({
+          error: "Request timeout",
+          details: "Python backend took too long to respond",
+        });
+      } else {
+        res.status(500).json({
+          error: "Failed to convert IPA to Kannada",
+          details: error.message || "Unknown error occurred",
+          code: error.code,
+        });
+      }
+    }
+  });
+
   // Fallback: serve index.html for any unknown route (SPA fallback - MUST be last)
   // Express 5 requires named wildcard parameter syntax instead of just "*"
   app.get("/{*splat}", (req, res) => {
