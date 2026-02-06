@@ -114,9 +114,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // Serve static files - adjusted for Docker deployment
 // In Docker, frontend files are copied to /app root, not /app/Frontend_main
-const frontendPath = process.env.NODE_ENV === 'production' && !fs.existsSync(path.join(__dirname, "..", "Frontend_main"))
-  ? __dirname  // Docker: files are in /app
-  : path.join(__dirname, "..", "Frontend_main");  // Local: files are in ../Frontend_main
+const frontendPath =
+  process.env.NODE_ENV === "production" &&
+  !fs.existsSync(path.join(__dirname, "..", "Frontend_main"))
+    ? __dirname // Docker: files are in /app
+    : path.join(__dirname, "..", "Frontend_main"); // Local: files are in ../Frontend_main
 
 app.use(express.static(frontendPath));
 
@@ -966,13 +968,12 @@ app.use(express.static(frontendPath));
   // Proxy endpoint for IPA to Kannada conversion
   app.post("/ipa2kannada", async (req, res) => {
     try {
-      console.log("📥 Received IPA2Kannada request");
-      console.log("  - syllables:", req.body.syllables);
+      console.log("📥 Received IPA2Kannada request:", req.body);
 
       // Validate input
       if (!req.body.syllables || !Array.isArray(req.body.syllables)) {
         return res.status(400).json({
-          error: "Missing or invalid syllables parameter. Expected an array.",
+          error: "Missing or invalid syllables parameter",
         });
       }
 
@@ -982,7 +983,7 @@ app.use(express.static(frontendPath));
 
       const response = await axios.post(
         `${PYTHON_BACKEND_URL}/ipa2kannada`,
-        { syllables: req.body.syllables },
+        req.body,
         {
           headers: {
             "Content-Type": "application/json",
@@ -994,13 +995,7 @@ app.use(express.static(frontendPath));
       console.log("✅ IPA2Kannada conversion successful");
       res.json(response.data);
     } catch (error) {
-      console.error("❌ IPA2Kannada proxy error:", error);
-      console.error("Error details:", {
-        message: error.message,
-        code: error.code,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
+      console.error("❌ IPA2Kannada proxy error:", error.message);
 
       if (error.response) {
         // Python backend returned an error
@@ -1030,9 +1025,11 @@ app.use(express.static(frontendPath));
   // Fallback: serve index.html for any unknown route (SPA fallback - MUST be last)
   // Express 5 requires named wildcard parameter syntax instead of just "*"
   app.get("/{*splat}", (req, res) => {
-    const indexPath = process.env.NODE_ENV === 'production' && !fs.existsSync(path.join(__dirname, "..", "Frontend_main", "index.html"))
-      ? path.join(__dirname, "index.html")  // Docker: index.html is in /app
-      : path.join(__dirname, "..", "Frontend_main", "index.html");  // Local: ../Frontend_main/index.html
+    const indexPath =
+      process.env.NODE_ENV === "production" &&
+      !fs.existsSync(path.join(__dirname, "..", "Frontend_main", "index.html"))
+        ? path.join(__dirname, "index.html") // Docker: index.html is in /app
+        : path.join(__dirname, "..", "Frontend_main", "index.html"); // Local: ../Frontend_main/index.html
     res.sendFile(indexPath);
   });
 
