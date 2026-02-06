@@ -33,19 +33,20 @@ const useDatabase = () => {
 };
 
 // Optional font paths (add these files to assets/fonts to enable Unicode/IPA)
+// In production (Docker), files are at /app/assets/fonts/
+// In development, files are at ../Frontend_main/assets/fonts/
+const isProduction = process.env.NODE_ENV === "production";
+const assetsPath = isProduction
+  ? path.join(__dirname, "assets")
+  : path.join(__dirname, "..", "Frontend_main", "assets");
+
 const FONT_KANNADA_VAR = path.join(
-  __dirname,
-  "..",
-  "Frontend_main",
-  "assets",
+  assetsPath,
   "fonts",
   "NotoSansKannada-VariableFont_wdth,wght.ttf",
 );
 const FONT_KANNADA_REG = path.join(
-  __dirname,
-  "..",
-  "Frontend_main",
-  "assets",
+  assetsPath,
   "fonts",
   "NotoSansKannada-Regular.ttf",
 );
@@ -53,14 +54,7 @@ const FONT_KANNADA_REG = path.join(
 const FONT_KANNADA = fs.existsSync(FONT_KANNADA_REG)
   ? FONT_KANNADA_REG
   : FONT_KANNADA_VAR;
-const FONT_LATIN = path.join(
-  __dirname,
-  "..",
-  "Frontend_main",
-  "assets",
-  "fonts",
-  "NotoSans-Regular.ttf",
-);
+const FONT_LATIN = path.join(assetsPath, "fonts", "NotoSans-Regular.ttf");
 
 // Summarize SODA results into category counts
 function summarizeSODA(results = []) {
@@ -543,17 +537,27 @@ app.use(express.static(frontendPath));
       doc.pipe(res);
 
       // Register Kannada font if available
+      console.log("📝 PDF Generation - Font paths:");
+      console.log("  FONT_KANNADA:", FONT_KANNADA);
+      console.log("  FONT_LATIN:", FONT_LATIN);
+      console.log("  Kannada exists:", fs.existsSync(FONT_KANNADA));
+      console.log("  Latin exists:", fs.existsSync(FONT_LATIN));
+
       const useKannadaFont = fs.existsSync(FONT_KANNADA);
       if (useKannadaFont) {
+        console.log("✅ Registering Kannada font:", FONT_KANNADA);
         doc.registerFont("Kannada", FONT_KANNADA);
         doc.registerFont("KannadaBold", FONT_KANNADA); // Use same font for bold
-      }
-      if (fs.existsSync(FONT_LATIN)) {
-        doc.registerFont("Latin", FONT_LATIN);
+      } else {
+        console.warn("⚠️ Kannada font not found, using Helvetica fallback");
       }
 
       if (fs.existsSync(FONT_LATIN)) {
+        console.log("✅ Registering Latin font:", FONT_LATIN);
+        doc.registerFont("Latin", FONT_LATIN);
         doc.registerFont("ipa", FONT_LATIN);
+      } else {
+        console.warn("⚠️ Latin font not found, using Helvetica fallback");
       }
 
       // Kannada translations
